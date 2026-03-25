@@ -1,0 +1,13 @@
+{
+  "name": "Rise Language Academy",
+  "short_name": "Rise Academy",
+  "description": "발음 학습 & 학부모 리포트",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111111",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
