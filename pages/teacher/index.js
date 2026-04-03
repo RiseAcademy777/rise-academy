@@ -21,7 +21,7 @@ export async function getServerSideProps(ctx) {
   
   const { data: sessionData } = await sb
     .from('teacher_sessions')
-    .select('teacher_id, expires_at')
+  .select('teacher_id,expires_at')
     .eq('session_key', sessionKey)
     .single();
 
