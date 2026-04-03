@@ -34,10 +34,9 @@ export async function getServerSideProps(ctx) {
       (tokens || []).forEach(t => { if (!tokenMap[t.student_id]) tokenMap[t.student_id] = t; });
     }
 
-    return { props: { teacher: teacher || null, students, tokenMap, siteUrl: process.env.NEXT_PUBLIC_SITE_URL || '' } };
-  } catch (e) {
-    console.error('teacher page error:', e.message);
-    return { props: { teacher: null, students: [], tokenMap: {}, siteUrl: '' } };
+   } catch (e) {
+    console.error('TEACHER_PAGE_ERROR:', e.message, e.stack);
+    throw e;
   }
 }
 
