@@ -6,6 +6,7 @@ export async function getServerSideProps(ctx) {
   const { validateTeacher } = await import('../../lib/utils');
   const session = await validateTeacher(ctx.req);
   if (!session) return { redirect: { destination: '/login', permanent: false } };
+  console.log('SESSION:', JSON.stringify(session));
 
   const { createServerClient } = await import('../../lib/supabase');
   const sb = createServerClient();
@@ -13,6 +14,7 @@ export async function getServerSideProps(ctx) {
   const { data: teacher } = await sb.from('users').select('id,name,role').eq('id', session.teacher_id).single();
 
   const { data: classes } = await sb.from('classes').select('id,name,level_code').eq('teacher_id', session.teacher_id);
+  console.log('CLASSES:', JSON.stringify(classes), 'TEACHER_ID:', session.teacher_id);
 
   let students = [];
   if (classes && classes.length > 0) {
