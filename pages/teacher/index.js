@@ -37,22 +37,16 @@ export async function getServerSideProps(ctx) {
     .eq('id', teacherId)
     .single();
 
-  const { data: classes } = await sb
+ const { data: classes } = await sb
     .from('classes')
     .select('id,name,level_code')
     .eq('teacher_id', teacherId);
 
-  let students = [];
-  if (classes && classes.length > 0) {
-    const classIds = classes.map(c => c.id);
-    const { data } = await sb
-      .from('users')
-      .select('id,name,class_id,classes(id,name,level_code)')
-      .in('class_id', classIds)
-      .eq('role', 'student')
-      .order('name');
-    students = data || [];
-  }
+  const { data: students } = await sb
+    .from('users')
+    .select('id,name,class_id,classes(id,name,level_code)')
+    .eq('role', 'student')
+    .order('name');
 
   const sIds = students.map(s => s.id);
   let tokenMap = {};
