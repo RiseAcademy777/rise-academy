@@ -76,7 +76,7 @@ export async function getServerSideProps(ctx) {
     props: {
       teacher: teacher || null,
      students: students || [],
-      tokenMap,
+    tokenMap: tokenMap || {},
       pendingNotices: pendingNotices || 0,
       pendingReports: pendingReports || 0,
       siteUrl: process.env.NEXT_PUBLIC_SITE_URL || '',
