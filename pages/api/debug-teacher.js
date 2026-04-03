@@ -2,18 +2,18 @@ import { createServerClient } from '../../lib/supabase';
 
 export default async function handler(req, res) {
   const sb = createServerClient();
-  
+
   const { data: classes, error: e1 } = await sb
     .from('classes')
     .select('id,name,teacher_id')
     .limit(5);
-    
+
   const { data: students, error: e2 } = await sb
     .from('users')
     .select('id,name,class_id,role')
     .eq('role','student')
     .limit(5);
-    
+
   const { data: sessions, error: e3 } = await sb
     .from('teacher_sessions')
     .select('teacher_id,expires_at')
@@ -32,4 +32,3 @@ export default async function handler(req, res) {
     }
   });
 }
-```
