@@ -48,7 +48,7 @@ export async function getServerSideProps(ctx) {
     .eq('role', 'student')
     .order('name');
 
-  const sIds = students.map(s => s.id);
+  const sIds = (students || []).map(s => s.id);
   let tokenMap = {};
   if (sIds.length > 0) {
     const { data: tokens } = await sb
@@ -75,7 +75,7 @@ export async function getServerSideProps(ctx) {
   return {
     props: {
       teacher: teacher || null,
-      students,
+     students: students || [],
       tokenMap,
       pendingNotices: pendingNotices || 0,
       pendingReports: pendingReports || 0,
