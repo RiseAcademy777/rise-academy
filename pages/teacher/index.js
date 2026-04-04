@@ -36,7 +36,7 @@ export async function getServerSideProps(ctx) {
 
    } catch (e) {
     console.error('TEACHER_PAGE_ERROR:', e.message, e.stack);
-    throw e;
+   return { props: { teacher: null, students: [], tokenMap: {}, siteUrl: '' } };
   }
 }
 
