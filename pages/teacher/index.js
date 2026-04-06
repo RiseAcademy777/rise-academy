@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { createServerClient } from '../../lib/supabase';
 
 export async function getServerSideProps(ctx) {
   try {
-    const { createServerClient } = await import('../../lib/supabase');
+   
     const sb = createServerClient();
 
     const cookieHeader = ctx.req.headers.cookie || '';
