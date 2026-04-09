@@ -1,68 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { createClient } from '@supabase/supabase-js';
 
-function getSupabase() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
-}
-
-export async function getServerSideProps(ctx) {
-  const cookieHeader = ctx.req.headers.cookie || '';
-  let sessionKey = '';
-  cookieHeader.split(';').forEach(c => {
-    const parts = c.trim().split('=');
-    if (parts[0] === 'teacher_session') sessionKey = parts.slice(1).join('=');
-  });
-
-  if (!sessionKey) return { redirect: { destination: '/login', permanent: false } };
-
-  const sb = getSupabase();
-
-  const { data: sess } = await sb
-    .from('teacher_sessions')
-    .select('teacher_id,expires_at')
-    .eq('session_key', sessionKey)
-    .maybeSingle();
-
-  if (!sess || new Date(sess.expires_at) < new Date()) {
-    return { redirect: { destination: '/login', permanent: false } };
-  }
-
-  const { data: teacher } = await sb
-    .from('users')
-    .select('id,name,role')
-    .eq('id', sess.teacher_id)
-    .maybeSingle();
-
-  const { data: students } = await sb
-    .from('users')
-    .select('id,name,class_id,classes(id,name)')
-    .eq('role', 'student')
-    .order('name');
-
-  return {
-    props: {
-      teacher: teacher || null,
-      students: students || [],
-      siteUrl: process.env.NEXT_PUBLIC_SITE_URL || '',
-    },
-  };
-}
-
-function getDaysLeft(exp) {
-  return Math.max(0, Math.ceil((new Date(exp) - new Date()) / 86400000));
-}
-
-export default function TeacherPage({ teacher, students, siteUrl }) {
+export default function TeacherPage() {
+  const [teacher, setTeacher] = useState(null);
+  const [students, setStudents] = useState([]);
   const [links, setLinks] = useState({});
   const [gen, setGen] = useState({});
   const [copied, setCopied] = useState({});
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '';
+
+  useEffect(() => {
+    fetch('/api/students-all')
+      .then(r => r.json())
+      .then(d => { setStudents(d.students || []); setLoading(false); })
+      .catch(() => setLoading(false));
+
+    fetch('/api/auth/me')
+      .then(r => r.json())
+      .then(d => { if (d.teacher) setTeacher(d.teacher); else router.push('/login'); })
+      .catch(() => router.push('/login'));
+  }, []);
 
   async function generateLink(studentId) {
     setGen(p => ({ ...p, [studentId]: true }));
@@ -89,6 +49,10 @@ export default function TeacherPage({ teacher, students, siteUrl }) {
     router.push('/login');
   }
 
+  function getDaysLeft(exp) {
+    return Math.max(0, Math.ceil((new Date(exp) - new Date()) / 86400000));
+  }
+
   return (
     <>
       <Head><title>강사 대시보드 · Rise Academy</title><meta name="viewport" content="width=device-width,initial-scale=1"/></Head>
@@ -97,7 +61,7 @@ export default function TeacherPage({ teacher, students, siteUrl }) {
           <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-400">Rise Language Academy</p>
-              <p className="text-sm font-semibold text-gray-900">{teacher?.name} 선생님</p>
+              <p className="text-sm font-semibold text-gray-900">{teacher?.name || '...'} 선생님</p>
             </div>
             <div className="flex items-center gap-3">
               {teacher?.role === 'director' && (
@@ -128,10 +92,14 @@ export default function TeacherPage({ teacher, students, siteUrl }) {
             <strong>링크 사용법</strong> · 학생 이름 옆 "링크 생성" → "복사" → 카카오톡 전송 · 링크는 <strong>10일간 유효</strong>
           </div>
 
-          <p className="text-xs text-gray-400 text-center">전체 {students.length}명</p>
+          {loading && <p className="text-center text-sm text-gray-400 py-8">학생 목록 불러오는 중...</p>}
 
-          {students.length === 0 && (
+          {!loading && students.length === 0 && (
             <div className="text-center py-12 text-sm text-gray-400">등록된 학생이 없습니다.</div>
+          )}
+
+          {!loading && students.length > 0 && (
+            <p className="text-xs text-gray-400 text-center">전체 {students.length}명</p>
           )}
 
           {students.map(student => {
