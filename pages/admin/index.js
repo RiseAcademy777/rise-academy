@@ -30,7 +30,8 @@ export default function AdminDashboard({ teacher, studentCount, sentCount }) {
           <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-400">Rise Language Academy</p>
-              <p className="text-sm font-semibold text-gray-900">{teacher?.name} 원장님 · 관리자</p>
+              <p className="text-sm font-semibold text-gray-900 cursor-pointer hover:text-blue-600"
+   onClick={() => router.push('/')}>{teacher?.name} 원장님 · 관리자</p>
             </div>
             <button onClick={() => router.push('/teacher')} className="text-xs text-blue-600">강사 화면</button>
           </div>
