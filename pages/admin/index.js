@@ -20,6 +20,8 @@ export default function AdminDashboard({ teacher, studentCount, sentCount }) {
     { label: '커리큘럼 일정', desc: '단원·날짜 설정', icon: '📅', href: '/admin/schedule' },
     { label: '콘텐츠 관리', desc: '문장·단어 관리', icon: '📚', href: '/admin/content' },
     { label: '강사 관리', desc: '계정·클래스 배정', icon: '👩‍🏫', href: '/admin/teachers' },
+    { label: '반 관리', desc: '개설·담당 배정', icon: '🏫', href: '/admin/classes' },
+    { label: '학생 관리', desc: '등록·반 배치', icon: '👦', href: '/admin/students' },
     { label: '전체 현황', desc: '학생·리포트 통계', icon: '📊', href: '/admin/stats' },
   ];
   return (
