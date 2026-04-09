@@ -1,11 +1,18 @@
-import { createClient } from '@supabase/supabase-js';
-
 export default async function handler(req, res) {
-  const sb = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
-  const { data } = await sb.from('users').select('id,name,class_id,classes(id,name)').eq('role','student').order('name');
-  return res.status(200).json({ students: data || [] });
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!url || !key) {
+    return res.status(500).json({ error: 'env missing', hasUrl: !!url, hasKey: !!key });
+  }
+
+  const response = await fetch(`${url}/rest/v1/users?role=eq.student&select=id,name,class_id&order=name`, {
+    headers: {
+      'apikey': key,
+      'Authorization': `Bearer ${key}`,
+    }
+  });
+  
+  const data = await response.json();
+  return res.status(200).json({ students: data || [], count: Array.isArray(data) ? data.length : 0 });
 }
