@@ -6,10 +6,11 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'env missing', hasUrl: !!url, hasKey: !!key });
   }
 
-  const response = await fetch(`${url}/rest/v1/students?select=id,name,class_id&order=name`, {
+  const response = await fetch(`${url}/rest/v1/users?role=eq.student&select=id,name,class_id&order=name`, {
     headers: {
       'apikey': key,
       'Authorization': `Bearer ${key}`,
+      'Accept': 'application/json',
     }
   });
   
